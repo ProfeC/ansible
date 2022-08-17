@@ -1,0 +1,19 @@
+---
+  - hosts: local
+    name: "My first playbook"
+    
+    tasks:
+
+      - name: "Test reachability"
+        ping:
+
+      - name: "Find all YAML files in ~"
+        ansible.builtin.find:
+          paths: 
+            - "~/Ansible"
+          file_type: file
+          # age: 1h
+          patterns: 
+            - "*.yaml"
+            - "*.yml"
+          recurse: yes

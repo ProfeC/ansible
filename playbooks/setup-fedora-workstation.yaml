@@ -1,0 +1,79 @@
+---
+- hosts: localhost
+  become: true
+  
+  vars:
+    # user: # Get from --extra-vars "user=$(whoami)"
+    dotfiles_repo: "https://github.com/ProfeC/dotfiles.git"
+    ssh_key: ".ssh/id_rsa"
+    tmp_dotfile_location: "/home/{{ user }}/tmp-dotfiles"
+
+  tasks:
+    - name: "Install System Packages"
+      dnf:
+        name:
+          - bat
+          - curl
+          # - DBeaver
+          - exa
+          - fish
+          # - Flatpak
+          - git
+          - nano
+          - podman
+          # - Smartgit
+          - vim
+          # - Vivaldi
+          # - VLC
+          # - VS Code
+          - wget
+        state: latest
+
+    - name: "Install Python Packages"
+      pip:
+        name:
+          - poetry
+        state: latest
+
+    - name: "Check out dotfiles from repository"
+      become: false
+      git:
+        accept_hostkey: yes
+        dest: "{{ tmp_dotfile_location }}"
+        force: yes
+        key_file: "/home/{{ user }}/{{ ssh_key }}"
+        repo: "{{ dotfiles_repo }}"
+        version: development
+      delegate_to: localhost
+      run_once: true
+
+    - name: "Copy .aliases to user's home"
+      copy:
+        src: "{{ tmp_dotfile_location }}/bash/aliases"
+        dest: "/home/{{ user }}/.aliases"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: '0644'
+
+    - name: Load aliases in .bashrc
+      blockinfile:
+        path: "/home/{{ user }}/.bashrc"
+        block: |
+          if [ -f ~/.aliases ]; then
+            source ~/.aliases
+          fi
+
+    - name: Load aliases in fish config
+      blockinfile:
+        path: "/home/{{ user }}/.config/fish/config.fish"
+        block: |
+          if test -f ~/.aliases
+            source ~/.aliases
+          end
+
+    # - name: "Name of the task"
+    #   ansible_module:
+    #     module_parameter:
+    #       - value
+    #       - value2
+    #   task_parameter: value

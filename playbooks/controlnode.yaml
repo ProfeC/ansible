@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Get local information
+      debug:
+        var: hostvars[inventory_hostname]
+        verbosity: 1

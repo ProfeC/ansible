@@ -1,0 +1,13 @@
+---
+- hosts: swashbuckler
+  name: Update Swashbuckler Servers
+  
+  tasks:
+    - name: "Test reachability"
+      ping:
+
+    - name: Only run "update_cache=yes" if the last one is more than 3600 seconds ago
+      become: true
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
