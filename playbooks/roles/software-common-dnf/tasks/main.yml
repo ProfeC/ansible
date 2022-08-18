@@ -1,0 +1,16 @@
+---
+- name: Installing Common DNF packages
+  become: true
+  become_method: sudo
+  dnf:
+    pkg:
+      - bat
+      - curl
+      - dialog
+      - exa
+      - fish
+      # - Flatpak
+      - nano
+      - vim
+      - wget
+    state: latest

@@ -1,0 +1,11 @@
+---
+- hosts: local
+  tasks:
+  - include_role:
+    name: software-common-dnf
+
+  - include_role:
+    name: software-developer
+
+  # - include_role:
+  #   name: something else
