@@ -8,6 +8,7 @@
       - dbeaver-ce
       - git
       # - MariaDB / MySQL
+      - podman
       # - Postgres?
       # - Redix / Mongo?
     state: latest

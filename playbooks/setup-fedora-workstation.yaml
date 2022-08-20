@@ -12,21 +12,21 @@
     - name: "Install System Packages"
       dnf:
         name:
-          - bat
-          - curl
+          # - bat
+          # - curl
           # - DBeaver
-          - exa
-          - fish
+          # - exa
+          # - fish
           # - Flatpak
-          - git
-          - nano
-          - podman
+          # - git
+          # - nano
+          # - podman
           # - Smartgit
-          - vim
+          # - vim
           # - Vivaldi
           # - VLC
           # - VS Code
-          - wget
+          # - wget
         state: latest
 
     - name: "Install Python Packages"
@@ -35,41 +35,41 @@
           - poetry
         state: latest
 
-    - name: "Check out dotfiles from repository"
-      become: false
-      git:
-        accept_hostkey: yes
-        dest: "{{ tmp_dotfile_location }}"
-        force: yes
-        key_file: "/home/{{ user }}/{{ ssh_key }}"
-        repo: "{{ dotfiles_repo }}"
-        version: development
-      delegate_to: localhost
-      run_once: true
+    # - name: "Check out dotfiles from repository"
+    #   become: false
+    #   git:
+    #     accept_hostkey: yes
+    #     dest: "{{ tmp_dotfile_location }}"
+    #     force: yes
+    #     key_file: "/home/{{ user }}/{{ ssh_key }}"
+    #     repo: "{{ dotfiles_repo }}"
+    #     version: development
+    #   delegate_to: localhost
+    #   run_once: true
 
-    - name: "Copy .aliases to user's home"
-      copy:
-        src: "{{ tmp_dotfile_location }}/bash/aliases"
-        dest: "/home/{{ user }}/.aliases"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-        mode: '0644'
+    # - name: "Copy .aliases to user's home"
+    #   copy:
+    #     src: "{{ tmp_dotfile_location }}/bash/aliases"
+    #     dest: "/home/{{ user }}/.aliases"
+    #     owner: "{{ user }}"
+    #     group: "{{ user }}"
+    #     mode: '0644'
 
-    - name: Load aliases in .bashrc
-      blockinfile:
-        path: "/home/{{ user }}/.bashrc"
-        block: |
-          if [ -f ~/.aliases ]; then
-            source ~/.aliases
-          fi
+    # - name: Load aliases in .bashrc
+    #   blockinfile:
+    #     path: "/home/{{ user }}/.bashrc"
+    #     block: |
+    #       if [ -f ~/.aliases ]; then
+    #         source ~/.aliases
+    #       fi
 
-    - name: Load aliases in fish config
-      blockinfile:
-        path: "/home/{{ user }}/.config/fish/config.fish"
-        block: |
-          if test -f ~/.aliases
-            source ~/.aliases
-          end
+    # - name: Load aliases in fish config
+    #   blockinfile:
+    #     path: "/home/{{ user }}/.config/fish/config.fish"
+    #     block: |
+    #       if test -f ~/.aliases
+    #         source ~/.aliases
+    #       end
 
     # - name: "Name of the task"
     #   ansible_module:
