@@ -1,0 +1,7 @@
+---
+# Defaults for the python software role
+- name: "Install Python Packages"
+  pip:
+    name:
+      - poetry
+    state: latest

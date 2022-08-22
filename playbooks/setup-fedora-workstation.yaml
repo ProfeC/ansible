@@ -9,31 +9,31 @@
     tmp_dotfile_location: "/home/{{ user }}/tmp-dotfiles"
 
   tasks:
-    - name: "Install System Packages"
-      dnf:
-        name:
-          # - bat
-          # - curl
-          # - DBeaver
-          # - exa
-          # - fish
-          # - Flatpak
-          # - git
-          # - nano
-          # - podman
-          # - Smartgit
-          # - vim
-          # - Vivaldi
-          # - VLC
-          # - VS Code
-          # - wget
-        state: latest
+    # - name: "Install System Packages"
+    #   dnf:
+    #     name:
+    #       # - bat
+    #       # - curl
+    #       # - DBeaver
+    #       # - exa
+    #       # - fish
+    #       # - Flatpak
+    #       # - git
+    #       # - nano
+    #       # - podman
+    #       # - Smartgit
+    #       # - vim
+    #       # - Vivaldi
+    #       # - VLC
+    #       # - VS Code
+    #       # - wget
+    #     state: latest
 
-    - name: "Install Python Packages"
-      pip:
-        name:
-          - poetry
-        state: latest
+    # - name: "Install Python Packages"
+    #   pip:
+    #     name:
+    #       - poetry
+    #     state: latest
 
     # - name: "Check out dotfiles from repository"
     #   become: false
