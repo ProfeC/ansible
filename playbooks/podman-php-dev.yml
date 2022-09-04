@@ -1,0 +1,110 @@
+---
+- name: Testing
+  hosts: localhost
+  connection: local
+
+  tasks:
+  - name: "Display the current directory."
+    shell: echo $PWD
+    register: CURRENT_DIR
+  # - debug: msg="CURRENT_DIR is {{ CURRENT_DIR.stdout }}."
+  
+  - name: "Get current user."
+    shell: echo $USER
+    register: CURRENT_USER
+  # - debug: msg="CURRENT_USER is {{ CURRENT_USER.stdout }}."
+
+  - name: "Make sure Podman is available."
+    become: true
+    ansible.builtin.package:
+      name: podman
+      state: present
+
+  # Pull images down if needed
+  # - name: "Pull httpd"
+  #   containers.podman.podman_image:
+  #     name: httpd
+  # - name: "Pull Apache with PHP"
+  #   containers.podman.podman_image:
+  #     name: php
+  #     tag: apache
+  # - name: "Pull MariaDB for MySQL"
+  #   containers.podman.podman_image:
+  #     name: mariadb
+  # - name: "Pull phpMyAdmin"
+  #   containers.podman.podman_image:
+  #     name: phpmyadmin
+
+  # - name: "Spin up a httpd container"
+  #   containers.podman.podman_container:
+  #     name: webserver
+  #     image: httpd
+  #     state: started
+  #     detach: true
+  #     exposed_ports:
+  #         - 80
+  #     ports:
+  #         - 4444:80
+  #     volumes: "/home/{{CURRENT_USER.stdout}}/Projects/:/usr/local/apache2/htdocs/:Z"
+
+  - name: "Create a pod"
+    containers.podman.podman_pod:
+      name: phpDev
+      hostname: phpdev.local
+      state: created
+      ports:
+        - 3306:3306
+        - 8000:80
+        - 8001:8001
+
+  - name: "Spin up a containers for our DEV environment"
+    containers.podman.podman_containers:
+      containers:
+        - name: webserver
+          image: php:apache
+          pod: phpDev
+          state: started
+          detach: true
+          exposed_ports:
+              - 80
+          # published_ports:
+          #     - 8000:80
+          volumes: 
+            - "/home/{{CURRENT_USER.stdout}}/Projects:/var/www/html:z"
+
+        - name: mariadb
+          image: mariadb
+          pod: phpDev
+          state: started
+          detach: true
+          env:
+            MARIADB_ROOT_PASSWORD: "p@ssw0rd"
+            MARIADB_DATABASE: "learning"
+            MARIADB_USER: "learner"
+            MARIADB_PASSWORD: "l3@rn3r"
+          exposed_ports:
+              - 3306
+          # published_ports:
+          #     - 3306:3306
+          volumes: 
+            - "/home/{{CURRENT_USER.stdout}}/Projects/mysql:/var/lib/mysql:z"
+
+        - name: phpmyadmin
+          image: phpmyadmin
+          pod: phpDev
+          state: started
+          detach: true
+          env:
+            APACHE_PORT: "8001"
+            PMA_HOST: mariadb
+            PMA_USER: "root"
+            PMA_PASSWORD: "p@ssw0rd"
+          exposed_ports:
+              - 8001
+          # published_ports:
+          #     - 8001:80
+
+
+#### ISSUES
+#
+# No directory browsing from apache.
