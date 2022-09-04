@@ -5,13 +5,13 @@
     # user: # Get from --extra-vars "user=$(whoami)"
     dotfiles_repo: "https://github.com/ProfeC/dotfiles.git"
     ssh_key: ".ssh/id_rsa"
-    tmp_dotfile_location: "/home/{{ user }}/tmp-dotfiles"
+    tmp_dotfile_location: "/home/{{ CURRENT_USER.stdout }}/tmp-dotfiles"
 
   tasks:
   - name: "Get current user"
     shell: echo $USER
-    register: user
-  - debug: msg="Current user is {{ user.stdout }}."
+    register: CURRENT_USER
+  - debug: msg="CURRENT_USER is {{ CURRENT_USER.stdout }}."
 
   - include_role:
       name: software-common-dnf
@@ -28,7 +28,7 @@
       accept_hostkey: yes
       dest: "{{ tmp_dotfile_location }}"
       force: yes
-      key_file: "/home/{{ user }}/{{ ssh_key }}"
+      key_file: "/home/{{ CURRENT_USER }}/{{ ssh_key }}"
       repo: "{{ dotfiles_repo }}"
       version: development
     delegate_to: localhost

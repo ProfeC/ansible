@@ -1,3 +1,25 @@
+---
+date: August 30, 2022
+export_on_save:
+    html: true
+    pandoc: true
+fontsize: 10pt
+geometry: margin=0.5in
+html:
+  embed_local_images: false
+  embed_svg: true
+  offline: false
+  toc: true
+lang: en_us
+linkcolor: red
+output: 
+    pdf_document:
+        highlight: pygments
+papersize: letter
+print_background: true
+title: "Automation Ideas for Ansible"
+---
+
 # Automation ideas for Ansible.
 
 Linux hosts will be configured for Fedora (Redhat) first. Debian based systems will follow.
