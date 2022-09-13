@@ -1,0 +1,28 @@
+---
+# tasks file for test-role-20220913
+- name: Output facts with a playbook
+  hosts: localhost
+  connection: local
+  # gather_facts: true # Does this by default.
+  
+  tasks:
+  - name: Prints Ansible facts
+    debug:
+      msg: The default IPv4 address of {{ ansible_fqdn }} is {{ ansible_default_ipv4.address }}
+
+- name: Copy a file to the temp directory
+  hosts: localhost
+  connection: local
+  # gather_facts: true # Does this by default.
+  
+  tasks:
+  - name: Copy a file to ./tmp
+    ansible.builtin.copy:
+      src: ~/ansible/staging
+      dest: ~/ansible/tmp/staging
+    notify: debug_me
+
+  handlers:
+  - name: debug_me
+    debug:
+      msg: Something happened.
