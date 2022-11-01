@@ -8,11 +8,18 @@
     shell: echo $PWD
     register: CURRENT_DIR
   # - debug: msg="CURRENT_DIR is {{ CURRENT_DIR.stdout }}."
-  
+
   - name: "Get current user."
     shell: echo $USER
     register: CURRENT_USER
   # - debug: msg="CURRENT_USER is {{ CURRENT_USER.stdout }}."
+
+  - name: "Create directories"
+    file:
+      path: "/home/{{CURRENT_USER.stdout}}/Projects/mysql"
+      state: directory
+      mode: 0755
+    when: ansible_distribution != "Windows"
 
   - name: "Make sure Podman is available."
     become: true
@@ -73,7 +80,7 @@
             - "/home/{{CURRENT_USER.stdout}}/Projects:/var/www/html:z"
 
         - name: mariadb
-          image: mariadb
+          image: docker.io/mariadb
           pod: phpDev
           state: started
           detach: true
@@ -90,7 +97,7 @@
             - "/home/{{CURRENT_USER.stdout}}/Projects/mysql:/var/lib/mysql:z"
 
         - name: phpmyadmin
-          image: phpmyadmin
+          image: docker.io/phpmyadmin
           pod: phpDev
           state: started
           detach: true
