@@ -21,7 +21,7 @@
       mode: 0755
     when: ansible_distribution != "Windows"
 
-  - name: "Make sure Podman is available."
+  - name: "Make sure Docker is available."
     become: true
     ansible.builtin.package:
       name: docker
