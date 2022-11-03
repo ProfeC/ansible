@@ -1,0 +1,104 @@
+---
+- name: PHP Development Pod
+  hosts: localhost
+  connection: local
+
+  tasks:
+  - name: "Display the current directory."
+    shell: echo $PWD
+    register: CURRENT_DIR
+  # - debug: msg="CURRENT_DIR is {{ CURRENT_DIR.stdout }}."
+
+  - name: "Get current user."
+    shell: echo $USER
+    register: CURRENT_USER
+  # - debug: msg="CURRENT_USER is {{ CURRENT_USER.stdout }}."
+
+  - name: "Create directories"
+    file:
+      path: "/home/{{CURRENT_USER.stdout}}/Projects/mysql"
+      state: directory
+      mode: 0755
+    when: ansible_distribution != "Windows"
+
+  - name: "Make sure Podman is available."
+    become: true
+    ansible.builtin.package:
+      name: docker
+      state: present
+
+  - name: "Spin up a containers for our DEV environment"
+    community.docker.docker_stack:
+      state: present
+      name: phpDev
+      compose:
+        - version: '3'
+          services:
+            webserver:
+              image: docker.io/php:apache
+              container_name: webserver
+              hostname: webserver
+              # mem_limit: 1024m
+              restart: unless-stopped
+
+              ports:
+                  - 80
+              # published_ports:
+              #     - 8000:80
+              volumes:
+                - "/home/{{CURRENT_USER.stdout}}/Projects:/var/www/html:z"
+
+            mariadb:
+              image: docker.io/mariadb:latest
+              #image: lscr.io/linuxserver/mariadb:latest
+              container_name: mariadb
+              hostname: mariadb
+              # mem_limit: 1024m
+              restart: unless-stopped
+
+              ports:
+                - 3306:3306
+
+              environment:
+                TZ: "America/New_York"
+                MARIADB_ROOT_PASSWORD: "p@ssw0rd"
+                MARIADB_DATABASE: "learning"
+                MARIADB_USER: "learner"
+                MARIADB_PASSWORD: "l3@rn3r"
+
+              volumes:
+                - "/home/{{CURRENT_USER.stdout}}/Projects/mysql:/var/lib/mysql:z"
+
+              # #Health Check
+              # healthcheck:
+              #   test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+              #   interval: 10s
+              #   timeout: 3s
+
+            phpmyadmin:
+              image: lscr.io/linuxserver/phpmyadmin:latest
+              container_name: phpmyadmin
+              hostname: phpmyadmin
+              # mem_limit: 512m
+              restart: unless-stopped
+
+              ports:
+                - 8001:80
+
+              environment:
+                TZ: "America/New_York"
+                PMA_ARBITRARY: 1 #optional
+                APACHE_PORT: "8001"
+                PMA_HOST: mariadb
+                PMA_USER: "root"
+                PMA_PASSWORD: "p@ssw0rd"
+
+              #Health Check
+              #healthcheck:
+              #  test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+              #  interval: 10s
+              #  timeout: 3s
+
+#### ISSUES
+#
+# No directory browsing from apache.
