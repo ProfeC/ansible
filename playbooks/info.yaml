@@ -1,0 +1,6 @@
+---
+- name: Get info about inventory hosts
+  hosts: all
+
+  tasks:
+  - ping
