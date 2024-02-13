@@ -16,11 +16,13 @@ all:
 
     docker_control: #prxmx ID = ct107
       ansible_host: 192.168.20.140
+      ansible_user: lee
 
     docker_01: #prxmx ID = vm103
       ansible_host: 192.168.20.244
+      ansible_user: lee
 
-    hoas: #HomeAssistan prxmx ID = vm114
+    hoas: #HomeAssistant prxmx ID = vm114
       ansible_host: 192.168.20.164
 
     jellyfin: #prxmx ID = vm112
