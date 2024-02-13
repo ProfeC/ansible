@@ -1,0 +1,115 @@
+---
+all:
+  hosts:
+    local: #ansible & terraform at prxmx ID = ct100
+      ansible_connection: local
+      ansible_host: 127.0.0.1
+
+    adguard: #prxmx ID = ct104
+      ansible_host: 192.168.20.3
+
+    cypher: #prxmx ID = vm113
+      ansible_host: 192.168.90.6
+
+    db01: #prxmx ID = vm102
+      ansible_host: 192.168.20.60
+
+    docker_control: #prxmx ID = ct107
+      ansible_host: 192.168.20.140
+
+    docker_01: #prxmx ID = vm103
+      ansible_host: 192.168.20.244
+
+    hoas: #HomeAssistan prxmx ID = vm114
+      ansible_host: 192.168.20.164
+
+    jellyfin: #prxmx ID = vm112
+      ansible_host: 192.168.20.89
+
+    kasm: #prxmx ID = vm108
+      ansible_host: 192.168.20.78
+
+    kube_admin: #prxmx IS = vm500
+      ansible_host: 192.168.20.8
+
+    kube_server1: #prxmx IS = vm501
+      ansible_host: 192.168.20.10
+
+    kube_server2: #prxmx IS = vm502
+      ansible_host: 192.168.20.11
+
+    kube_server3: #prxmx IS = vm503
+      ansible_host: 192.168.20.12
+
+    kube_agent1: #prxmx IS = vm504
+      ansible_host: 192.168.20.13
+
+    kube_agent2: #prxmx IS = vm505
+      ansible_host: 192.168.20.14
+
+    longhorn1: #prxmx IS = vm506
+      ansible_host: 192.168.20.15
+
+    longhorn2: #prxmx IS = vm505
+      ansible_host: 192.168.20.16
+
+    longhorn3: #prxmx IS = vm508
+      ansible_host: 192.168.20.17
+
+    morpheus:
+      ansible_host: 192.168.1.11
+
+    plex: #prxmx ID = vm110
+      ansible_host: 192.168.20.24
+
+    prxmx_backup_server: #QNAMP VM
+      ansible_host: 192.168.20.160
+
+    qnap_nas:
+      ansible_host: 192.168.1.4
+      ansible_user: Lee
+
+    swashbuckler: #prxmx ID = vm111
+      ansible_host: 192.168.20.193
+      ansible_user: arrrgh
+
+    traefik: #prxmx ID = ct105
+      ansible_host: 192.168.20.192
+
+    # trinity:
+    #   ansible_host: 192.168.1.10
+
+  vars:
+    ansible_connection: ssh
+    ansible_port: 22
+    ansible_user: root
+
+  children:
+    docker_servers:
+      hosts:
+        docker_01:
+        docker_control:
+
+    k8s:
+      hosts:
+        kube_admin:
+        kube_agent1:
+        kube_agent2:
+        kube_server1:
+        kube_server2:
+        kube_server3:
+        longhorn1:
+        longhorn2:
+        longhorn3:
+
+    media_servers:
+      hosts:
+        jellyfin:
+        plex:
+        swashbuckler:
+
+    proxmox:
+      hosts:
+        morpheus:
+        prxmx-backup-server:
+    #    trinity:
