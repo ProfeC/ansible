@@ -5,28 +5,32 @@ all:
       ansible_connection: local
       ansible_host: 127.0.0.1
 
-    adguard: #prxmx ID = ct104
-      ansible_host: 192.168.20.3
+    # adguard: #prxmx ID = ct104
+    #   ansible_host: 192.168.20.3
+    #   ansible_user: root
 
     cypher: #prxmx ID = vm113
       ansible_host: 192.168.90.6
+      ansible_user: lee
 
     db01: #prxmx ID = vm102
       ansible_host: 192.168.20.60
-
-    docker_control: #prxmx ID = ct107
-      ansible_host: 192.168.20.140
       ansible_user: lee
+
+    # docker_control: #prxmx ID = ct107
+    #   ansible_host: 192.168.20.140
+    #   ansible_user: root
 
     docker_01: #prxmx ID = vm103
       ansible_host: 192.168.20.244
       ansible_user: lee
 
-    hoas: #HomeAssistant prxmx ID = vm114
-      ansible_host: 192.168.20.164
+    # hoas: #HomeAssistant prxmx ID = vm114
+    #   ansible_host: 192.168.20.164
 
     jellyfin: #prxmx ID = vm112
       ansible_host: 192.168.20.89
+      ansible_user: jellyfin
 
     kasm: #prxmx ID = vm108
       ansible_host: 192.168.20.78
@@ -60,37 +64,41 @@ all:
 
     morpheus:
       ansible_host: 192.168.1.11
+      ansible_user: root
 
     plex: #prxmx ID = vm110
-      ansible_host: 192.168.20.24
+      ansible_host: 192.168.20.214
+      ansible_user: plex
 
     prxmx_backup_server: #QNAMP VM
       ansible_host: 192.168.20.160
+      ansible_user: root
 
-    qnap_nas:
-      ansible_host: 192.168.1.4
-      ansible_user: Lee
+    # qnap_nas:
+    #   ansible_host: 192.168.1.4
+    #   ansible_user: Lee
 
     swashbuckler: #prxmx ID = vm111
       ansible_host: 192.168.20.193
-      ansible_user: arrrgh
+      ansible_user: arrgh
 
-    traefik: #prxmx ID = ct105
-      ansible_host: 192.168.20.192
+    # traefik: #prxmx ID = ct105
+    #   ansible_host: 192.168.20.192
+    #   ansible_user: root
 
     # trinity:
     #   ansible_host: 192.168.1.10
 
   vars:
-    ansible_connection: ssh
-    ansible_port: 22
-    ansible_user: root
+    ansible_password: xxxxxxx
+    ansible_user: serveradmin
+    ansible_ssh_private_key_file: xxxxxxx
 
   children:
     docker_servers:
       hosts:
         docker_01:
-        docker_control:
+        # docker_control:
 
     k8s:
       hosts:
@@ -103,6 +111,8 @@ all:
         longhorn1:
         longhorn2:
         longhorn3:
+      # vars:
+      #   ansible_user: serveradmin
 
     media_servers:
       hosts:
@@ -113,5 +123,5 @@ all:
     proxmox:
       hosts:
         morpheus:
-        prxmx-backup-server:
+        prxmx_backup_server:
     #    trinity:
