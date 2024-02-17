@@ -11,3 +11,8 @@
 .redhat/
 .gnupg/
 .terraform.d/
+.terraform/
+plans/k8s/.terraform.lock.hcl
+plans/k8s/.terraform.tfstate.lock.info
+plans/k8s/terraform.tfstate
+plans/k8s/terraform.tfstate.backup

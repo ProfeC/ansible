@@ -1,0 +1,96 @@
+resource "proxmox_vm_qemu" "cloudinit-k8s-server" {
+    # Node name has to be the same name as within the cluster
+    # this might not include the FQDN
+    target_node = "morpheus"
+    desc = "Cloudinit Debian"
+    count = 1
+    onboot = false
+
+    # The template name to clone this vm from
+    clone = "debian12-cloud"
+
+    # Activate QEMU agent for this VM
+    agent = 1
+
+    os_type = "cloud-init"
+    cores = 2
+    sockets = 2
+    numa = true
+    vcpus = 0
+    cpu = "host"
+    memory = 4096
+    name = "test-server${count.index + 1}"
+
+    cloudinit_cdrom_storage = "fast-storage"
+    scsihw   = "virtio-scsi-single" 
+    bootdisk = "scsi0"
+
+    disks {
+        scsi {
+            scsi0 {
+                disk {
+                  storage = "fast-storage"
+                  size = 12
+                }
+            }
+        }
+    }
+
+    # Setup the ip address using cloud-init.
+    # Keep in mind to use the CIDR notation for the ip.
+    ipconfig0 = "ip=192.168.20.20${count.index + 1}/24,gw=192.168.20.1"
+    ciuser = "serveradmin"
+    nameserver = "192.168.20.3"
+    sshkeys = <<EOF
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCtmsr35Syy1YILOvsOnsXqUG7gdzz5FWmpiC0TNhD0dbehsamuetfUjlmOTaJzz1US93aBFsVDmE89R7XeWMqUjRzvDYE1RrW6QvDN+pHKOqyzqvoPuJmKE4L9HRpcLKj6Jn8SoFhzRBwu96tgg/99XWEQ8MSgyoGD728CIe9iWqvfJB0Z6wNK72YSGe1sF6JleUNvjmmEumSgIwIcAQ4kzFEowt8m41jhWhhEHz4Yv6LYzHILZmMqpAswzPXdNhkXp4wPnh5fw8BMRZtJnwp2MkpKLik5N6uNi/EtyRU/mW0H/9jyYr0rVeSiJt3SQgiDiuR/3iMI7pmMqmLjcCWzaQ12qZR2YhZrMOfvydpLZMGPZH2zm4CdColHw03Kg/NWS+IoJC94NNlyM5wkDJCVV2TdLcC+xeXEopto5f9y6SiRg5QueiJ01oIAvjCcl42mZ2wu1suviwjDCT3nbZG8URRdWJQ3FszOFyUP2TMEzNDtpsU+oe7zG9Y9tmBdNDk= clarkgar@shu-t480s-clarkgar
+    EOF
+}
+
+resource "proxmox_vm_qemu" "cloudinit-k8s-agent" {
+    # Node name has to be the same name as within the cluster
+    # this might not include the FQDN
+    target_node = "morpheus"
+    desc = "Cloudinit Debian"
+    count = 1
+    onboot = false
+
+    # The template name to clone this vm from
+    clone = "debian12-cloud"
+
+    # Activate QEMU agent for this VM
+    agent = 1
+
+    os_type = "cloud-init"
+    cores = 4
+    sockets = 2
+    numa = true
+    vcpus = 0
+    cpu = "host"
+    memory = 8192
+    name = "test-worker-0${count.index + 1}"
+
+    cloudinit_cdrom_storage = "fast-storage"
+    scsihw   = "virtio-scsi-single" 
+    bootdisk = "scsi0"
+
+    disks {
+        scsi {
+            scsi0 {
+                disk {
+                  storage = "fast-storage"
+                  size = 12
+                }
+            }
+        }
+    }
+
+    # Setup the ip address using cloud-init.
+    # Keep in mind to use the CIDR notation for the ip.
+    # ipconfig0 = "ip=192.168.3.11${count.index + 1}/24,gw=192.168.3.1"
+    vlan_id = 20
+    net0 = "BC:24:11:46:79:60"
+    ciuser = "serveradmin"
+    sshkeys = <<EOF
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCtmsr35Syy1YILOvsOnsXqUG7gdzz5FWmpiC0TNhD0dbehsamuetfUjlmOTaJzz1US93aBFsVDmE89R7XeWMqUjRzvDYE1RrW6QvDN+pHKOqyzqvoPuJmKE4L9HRpcLKj6Jn8SoFhzRBwu96tgg/99XWEQ8MSgyoGD728CIe9iWqvfJB0Z6wNK72YSGe1sF6JleUNvjmmEumSgIwIcAQ4kzFEowt8m41jhWhhEHz4Yv6LYzHILZmMqpAswzPXdNhkXp4wPnh5fw8BMRZtJnwp2MkpKLik5N6uNi/EtyRU/mW0H/9jyYr0rVeSiJt3SQgiDiuR/3iMI7pmMqmLjcCWzaQ12qZR2YhZrMOfvydpLZMGPZH2zm4CdColHw03Kg/NWS+IoJC94NNlyM5wkDJCVV2TdLcC+xeXEopto5f9y6SiRg5QueiJ01oIAvjCcl42mZ2wu1suviwjDCT3nbZG8URRdWJQ3FszOFyUP2TMEzNDtpsU+oe7zG9Y9tmBdNDk= clarkgar@shu-t480s-clarkgar
+    EOF
+}
