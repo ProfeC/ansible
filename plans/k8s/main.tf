@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     proxmox = {
-      source = "Telmate/proxmox"
+      source  = "Telmate/proxmox"
       version = "3.0.1-rc1"
     }
   }
@@ -19,66 +19,67 @@ provider "proxmox" {
 
   # leave tls_insecure set to true unless you have your proxmox SSL certificate situation fully sorted out (if you do, you will know)
   pm_tls_insecure = true
+
+  # (Optional; defaults to 4) Allowed simultaneous Proxmox processes (e.g. creating resources).
+  pm_parallel = 2
 }
 
 # resource is formatted to be "[type]" "[entity_name]" so in this case we are looking to create a proxmox_vm_qemu entity named test_server
 resource "proxmox_vm_qemu" "test_server" {
-  # another variable with contents 
-  clone = var.template_name
-  full_clone = true
-  
   for_each = var.servers
-
-  name = "test-kube-${each.key}"
+  # another variable with contents 
+  clone      = var.template_name
+  full_clone = true
+  name       = "kube-${each.key}"
 
   # this now reaches out to the vars file. I could've also used this var above in the pm_api_url setting but wanted to spell it out up there. target_node is different than api_url. target_node is which node hosts the template and thus also which node will host the new VM. it can be different than the host you use to communicate with the API. the variable contains the contents "prox-1u"
   target_node = var.proxmox_host["node"]
 
   # basic VM settings here. agent refers to guest agent
   agent = 1
-  cores = 2
-  cpu = "host"
-  desc = "This was generated with terraform"
+  cores = each.value["cores"]
+  cpu   = "host"
+  desc  = "This was generated with terraform"
   # force_create = true # force recreation during testing.
-  memory = 2048
-  numa = true
-  onboot = true
+  memory  = each.value["memory"]
+  numa    = true
+  onboot  = true
   os_type = "cloud-init"
-  sockets = 2
-  vcpus = 0
-  vmid = each.value["vmid"]
+  sockets = each.value["sockets"]
+  vcpus   = 0
+  vmid    = each.value["vmid"]
 
-  bootdisk = "scsi0"
+  bootdisk                = "scsi0"
   cloudinit_cdrom_storage = "fast-storage"
-  scsihw   = "virtio-scsi-single" 
+  scsihw                  = "virtio-scsi-single"
 
   disks {
     scsi {
       scsi0 {
         disk {
-          size = 25
+          size    = each.value["disk_size"]
           storage = "datahog"
           # iothread = true
         }
       }
     }
   }
-  
+
   # if you want two NICs, just copy this whole network section and duplicate it
   network {
-    model = "virtio"
-    bridge = "vmbr0"
-    tag = 20
+    model   = "virtio"
+    bridge  = "vmbr0"
+    tag     = 20
     macaddr = each.value["mac_addr"]
   }
 
   # not sure exactly what this is for. presumably something about MAC addresses and ignore network changes during the life of the VM
   lifecycle {
     ignore_changes = [
-      network,
+      network, usb,
     ]
   }
-  
+
   # the ${count.index + 1} thing appends text to the end of the ip address
   # in this case, since we are only adding a single VM, the IP will
   # be 10.98.1.91 since count.index starts at 0. this is how you can create
@@ -89,60 +90,56 @@ resource "proxmox_vm_qemu" "test_server" {
 
   # Cloudinit user
   ciuser = "serveradmin"
-  
+
   # # sshkeys set using variables. the variable contains the text of the key.
   # sshkeys = <<EOF
   # ${var.ssh_key}
   # EOF
 }
-/*
-resource "proxmox_vm_qemu" "test_server" {
-  # another variable with contents 
-  clone = var.template_name
-  full_clone = true
-  
-  name = "test-vm-${count.index + 1}" #count.index starts at 0, so + 1 means this VM will be named test-vm-1 in proxmox
 
-  target_node = var.proxmox_host["node"]
-
-  agent = 1
-  cores = 2
-  cpu = "host"
-  desc = "This was generated with terraform"
-  memory = 2048
-  numa = true
-  onboot = true
-  os_type = "cloud-init"
-  sockets = 2
-  vcpus = 0
-  vmid = 800
-
-  bootdisk = "scsi0"
+resource "proxmox_vm_qemu" "test_storage" {
+  for_each                = var.storage
+  agent                   = 1
+  bootdisk                = "scsi0"
+  clone                   = var.template_name
   cloudinit_cdrom_storage = "fast-storage"
-  scsihw   = "virtio-scsi-single" 
+  cores                   = each.value["cores"]
+  cpu                     = "host"
+  desc                    = "This was generated with terraform"
+  full_clone              = true
+  memory                  = each.value["memory"]
+  name                    = "storage-${each.key}"
+  numa                    = true
+  onboot                  = true
+  os_type                 = "cloud-init"
+  scsihw                  = "virtio-scsi-single"
+  sockets                 = each.value["sockets"]
+  target_node             = var.proxmox_host["node"]
+  vcpus                   = 0
+  vmid                    = each.value["vmid"]
 
   disks {
     scsi {
       scsi0 {
         disk {
-          size = 25
+          size    = each.value["disk_size"]
           storage = "datahog"
           # iothread = true
         }
       }
     }
   }
-  
+
   network {
-    model = "virtio"
-    bridge = "vmbr0"
-    tag = 20
-    macaddr = "92:3f:d1:16:07:c2"
+    model   = "virtio"
+    bridge  = "vmbr0"
+    tag     = 20
+    macaddr = each.value["mac_addr"]
   }
 
   lifecycle {
     ignore_changes = [
-      network, tag,
+      network, usb,
     ]
   }
 
