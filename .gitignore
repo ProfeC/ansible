@@ -18,3 +18,4 @@ plans/k8s/terraform.tfstate
 plans/k8s/terraform.tfstate.backup
 .config/
 .kube/
+kubectl
