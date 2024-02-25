@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: uptime-kuma
+    app.kubernetes.io/instance: uptime-kuma
+    app.kubernetes.io/name: uptime-kuma
+  name: uptime-kuma
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uptime-kuma
+  template:
+    metadata:
+      labels:
+        app: uptime-kuma
+        app.kubernetes.io/name: uptime-kuma
+    spec:
+      nodeSelector:
+        worker: "true"
+      containers:
+      - image: louislam/uptime-kuma:latest
+        imagePullPolicy: Always
+        name: uptime-kuma
+        env:
+        - name: TZ
+          value: "America/New_York"
+        - name: DOMAINNAME
+          value: profec.net
+        ports:
+          - containerPort: 3001
+        resources: {}
+        volumeMounts:
+          - mountPath: /app/data
+            name: uptime-kuma
+      restartPolicy: Always
+      volumes:
+        - name: uptime-kuma
+          persistentVolumeClaim:
+            claimName: uptime-kuma-claim
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: uptime-kuma-claim
+  namespace: monitoring
+  labels:
+    app: uptime-kuma
+spec:
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
