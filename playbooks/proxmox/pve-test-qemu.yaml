@@ -1,0 +1,49 @@
+---
+- name: Proxmox VE Provision Testing
+  hosts: morpheus
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: Ping hosts
+      ping:
+
+    - name: Create new Proxomox VM
+      community.general.proxmox_kvm:
+        agent: enabled=1
+        api_host: 192.168.1.11
+        api_token_id: token
+        api_token_secret: super-secret-token
+        api_user: ansible-prov@pam
+        clone: arbitrary_name
+        cores: 2
+        description: Created with Ansible.
+        full: true
+        localtime: true
+        memory: 2048
+        name: test-vm-ans-01
+        net:
+          net0: 'tag=20,virtio=BC:24:11:0B:25:F2'
+        newid: 800
+        node: morpheus
+        numa_enabled: true
+        sockets: 2
+        # state: started
+        storage: datahog
+        target: morpheus
+        timeout: 300
+        vmid: 9001
+
+    - name: Start new vm
+      community.general.proxmox_kvm:
+        api_host: 192.168.1.11
+        api_token_id: token
+        api_token_secret: super-secret-token
+        api_user: ansible-prov@pam
+        name: test-vm-ans-01
+        node: morpheus
+        state: started
+        timeout: 90
+        vmid: 800
+
+    # - name: Install guest agent.

@@ -53,13 +53,13 @@ all:
     kube_agent2: #prxmx IS = vm505
       ansible_host: 192.168.20.14
 
-    longhorn1: #prxmx IS = vm506
+    kube_storage1: #prxmx IS = vm506
       ansible_host: 192.168.20.15
 
-    longhorn2: #prxmx IS = vm505
+    kube_storage2: #prxmx IS = vm505
       ansible_host: 192.168.20.16
 
-    longhorn3: #prxmx IS = vm508
+    kube_storage3: #prxmx IS = vm508
       ansible_host: 192.168.20.17
 
     morpheus:
@@ -108,9 +108,32 @@ all:
         kube_server1:
         kube_server2:
         kube_server3:
-        longhorn1:
-        longhorn2:
-        longhorn3:
+        kube_storage1:
+        kube_storage2:
+        kube_storage3:
+      # vars:
+      #   ansible_user: serveradmin
+
+    k8s_agents:
+      hosts:
+        kube_agent1:
+        kube_agent2:
+      # vars:
+      #   ansible_user: serveradmin
+
+    k8s_servers:
+      hosts:
+        kube_server1:
+        kube_server2:
+        kube_server3:
+      # vars:
+      #   ansible_user: serveradmin
+
+    k8s_storage:
+      hosts:
+        kube_storage1:
+        kube_storage2:
+        kube_storage3:
       # vars:
       #   ansible_user: serveradmin
 

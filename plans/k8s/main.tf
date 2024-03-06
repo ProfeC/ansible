@@ -25,7 +25,7 @@ provider "proxmox" {
 }
 
 # resource is formatted to be "[type]" "[entity_name]" so in this case we are looking to create a proxmox_vm_qemu entity named test_server
-resource "proxmox_vm_qemu" "test_server" {
+resource "proxmox_vm_qemu" "server" {
   for_each = var.servers
   # another variable with contents 
   clone      = var.template_name
@@ -50,7 +50,7 @@ resource "proxmox_vm_qemu" "test_server" {
   vmid    = each.value["vmid"]
 
   bootdisk                = "scsi0"
-  cloudinit_cdrom_storage = "fast-storage"
+  cloudinit_cdrom_storage = "datahog"
   scsihw                  = "virtio-scsi-single"
 
   disks {
@@ -97,18 +97,18 @@ resource "proxmox_vm_qemu" "test_server" {
   # EOF
 }
 
-resource "proxmox_vm_qemu" "test_storage" {
+resource "proxmox_vm_qemu" "storage" {
   for_each                = var.storage
   agent                   = 1
   bootdisk                = "scsi0"
   clone                   = var.template_name
-  cloudinit_cdrom_storage = "fast-storage"
+  cloudinit_cdrom_storage = "datahog"
   cores                   = each.value["cores"]
   cpu                     = "host"
   desc                    = "This was generated with terraform"
   full_clone              = true
   memory                  = each.value["memory"]
-  name                    = "storage-${each.key}"
+  name                    = "kube-${each.key}"
   numa                    = true
   onboot                  = true
   os_type                 = "cloud-init"
