@@ -24,8 +24,8 @@ echo -e " \033[32;2m                                                           \
 # THIS SCRIPT IS FOR RKE2, NOT K3S!
 # THIS SCRIPT IS FOR RKE2, NOT K3S!
 
-# Set the IP addresses of master1
-master1=192.168.20.10
+# Set the IP addresses of server1
+server1=192.168.20.10
 
 # Set the IP addresses of your Longhorn nodes
 longhorn1=192.168.20.15

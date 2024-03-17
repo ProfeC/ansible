@@ -13,7 +13,7 @@
         agent: enabled=1
         api_host: 192.168.1.11
         api_token_id: token
-        api_token_secret: super-secret-token
+        api_token_secret: d19ed392-94f3-4b35-9fc1-94e2547ed713
         api_user: ansible-prov@pam
         clone: arbitrary_name
         cores: 2
@@ -38,7 +38,7 @@
       community.general.proxmox_kvm:
         api_host: 192.168.1.11
         api_token_id: token
-        api_token_secret: super-secret-token
+        api_token_secret: d19ed392-94f3-4b35-9fc1-94e2547ed713
         api_user: ansible-prov@pam
         name: test-vm-ans-01
         node: morpheus

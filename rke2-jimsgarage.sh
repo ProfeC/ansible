@@ -13,7 +13,7 @@ echo -e " \033[36;5m                     |   / ' <| _| / /                     \
 echo -e " \033[36;5m                     |_|_\_|\_\___/___|                    \033[0m"
 echo -e " \033[36;5m                                                           \033[0m"
 echo -e " \033[32;5m             https://youtube.com/@jims-garage              \033[0m"
-echo -e " \033[32;5m                                                           \033[0m"
+echo -e " \033[32;5m        https://www.youtube.com/watch?v=RC7NeTh-cf8        \033[0m"
 
 
 #############################################
@@ -23,11 +23,12 @@ echo -e " \033[32;5m                                                           \
 # Version of Kube-VIP to deploy
 KVVERSION="v0.6.4"
 
-# Set the IP addresses of the admin, masters, and workers nodes
-admin=192.168.20.8
-master1=192.168.20.10
-master2=192.168.20.11
-master3=192.168.20.12
+# Set the IP addresses of the admin, servers, and workers nodes
+# admin=192.168.20.8
+admin=192.168.20.102
+server1=192.168.20.10
+server2=192.168.20.11
+server3=192.168.20.12
 worker1=192.168.20.13
 worker2=192.168.20.14
 
@@ -40,23 +41,23 @@ interface=eth0
 # Set the virtual IP address (VIP)
 vip=192.168.20.29
 
-# Array of all master nodes
-allmasters=($master1 $master2 $master3)
+# Array of all server nodes
+allservers=($server1 $server2 $server3)
 
-# Array of master nodes
-masters=($master2 $master3)
+# Array of server nodes
+servers=($server2 $server3)
 
 # Array of worker nodes
 workers=($worker1 $worker2)
 
 # Array of all
-all=($master1 $master2 $master3 $worker1 $worker2)
+all=($server1 $server2 $server3 $worker1 $worker2)
 
-# Array of all minus master1
-allnomaster1=($master2 $master3 $worker1 $worker2)
+# Array of all minus server1
+allnoserver1=($server2 $server3 $worker1 $worker2)
 
 #Loadbalancer IP range
-lbrange=192.168.20.30-192.168.20.49
+lbrange=192.168.20.30-192.168.20.99
 
 #ssh certificate name variable
 certName=id_rsa
@@ -113,9 +114,9 @@ sudo mkdir -p /etc/rancher/rke2
 touch config.yaml
 echo "tls-san:" >> config.yaml 
 echo "  - $vip" >> config.yaml
-echo "  - $master1" >> config.yaml
-echo "  - $master2" >> config.yaml
-echo "  - $master3" >> config.yaml
+echo "  - $server1" >> config.yaml
+echo "  - $server2" >> config.yaml
+echo "  - $server3" >> config.yaml
 echo "write-kubeconfig-mode: 0644" >> config.yaml
 echo "disable:" >> config.yaml
 echo "  - rke2-ingress-nginx" >> config.yaml
@@ -125,16 +126,16 @@ sudo cp ~/config.yaml /etc/rancher/rke2/config.yaml
 # update path with rke2-binaries
 echo 'export KUBECONFIG=/etc/rancher/rke2/rke2.yaml' >> ~/.bashrc ; echo 'export PATH=${PATH}:/var/lib/rancher/rke2/bin' >> ~/.bashrc ; echo 'alias k=kubectl' >> ~/.bashrc ; source ~/.bashrc ;
 
-# Step 2: Copy kube-vip.yaml and certs to all masters
-for newnode in "${allmasters[@]}"; do
+# Step 2: Copy kube-vip.yaml and certs to all servers
+for newnode in "${allservers[@]}"; do
   scp -i ~/.ssh/$certName $HOME/kube-vip.yaml $user@$newnode:~/kube-vip.yaml
   scp -i ~/.ssh/$certName $HOME/config.yaml $user@$newnode:~/config.yaml
   scp -i ~/.ssh/$certName ~/.ssh/{$certName,$certName.pub} $user@$newnode:~/.ssh
   echo -e " \033[32;5mCopied successfully!\033[0m"
 done
 
-# Step 3: Connect to Master1 and move kube-vip.yaml and config.yaml. Then install RKE2, copy token back to admin machine. We then use the token to bootstrap additional masternodes
-ssh -tt $user@$master1 -i ~/.ssh/$certName sudo su <<EOF
+# Step 3: Connect to server1 and move kube-vip.yaml and config.yaml. Then install RKE2, copy token back to admin machine. We then use the token to bootstrap additional servernodes
+ssh -tt $user@$server1 -i ~/.ssh/$certName sudo su <<EOF
 mkdir -p /var/lib/rancher/rke2/server/manifests
 mv kube-vip.yaml /var/lib/rancher/rke2/server/manifests/kube-vip.yaml
 mkdir -p /etc/rancher/rke2
@@ -144,16 +145,19 @@ curl -sfL https://get.rke2.io | sh -
 systemctl enable rke2-server.service
 systemctl start rke2-server.service
 echo "StrictHostKeyChecking no" > ~/.ssh/config
-ssh-copy-id -i /home/$user/.ssh/$certName $user@$admin
-scp -i /home/$user/.ssh/$certName /var/lib/rancher/rke2/server/token $user@$admin:~/token
-scp -i /home/$user/.ssh/$certName /etc/rancher/rke2/rke2.yaml $user@$admin:~/.kube/rke2.yaml
+# ssh-copy-id -i /home/$user/.ssh/$certName $user@$admin
+ssh-copy-id -i /home/$user/.ssh/$certName ansible@$admin
+# scp -i /home/$user/.ssh/$certName /var/lib/rancher/rke2/server/token $user@$admin:~/token
+scp -i /home/$user/.ssh/$certName /var/lib/rancher/rke2/server/token ansible@$admin:~/token
+# scp -i /home/$user/.ssh/$certName /etc/rancher/rke2/rke2.yaml $user@$admin:~/.kube/rke2.yaml
+scp -i /home/$user/.ssh/$certName /etc/rancher/rke2/rke2.yaml ansible@$admin:~/.kube/rke2.yaml
 exit
 EOF
-echo -e " \033[32;5mMaster1 Completed\033[0m"
+echo -e " \033[32;5mserver1 Completed\033[0m"
 
 # Step 4: Set variable to the token we just extracted, set kube config location
 token=`cat token`
-sudo cat ~/.kube/rke2.yaml | sed 's/127.0.0.1/'$master1'/g' > $HOME/.kube/config
+sudo cat ~/.kube/rke2.yaml | sed 's/127.0.0.1/'$server1'/g' > $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 export KUBECONFIG=${HOME}/.kube/config
 sudo cp ~/.kube/config /etc/rancher/rke2/rke2.yaml
@@ -163,24 +167,24 @@ kubectl get nodes
 kubectl apply -f https://kube-vip.io/manifests/rbac.yaml
 kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
 
-# Step 6: Add other Masternodes, note we import the token we extracted from step 3
-for newnode in "${masters[@]}"; do
+# Step 6: Add other servernodes, note we import the token we extracted from step 3
+for newnode in "${servers[@]}"; do
   ssh -tt $user@$newnode -i ~/.ssh/$certName sudo su <<EOF
   mkdir -p /etc/rancher/rke2
   touch /etc/rancher/rke2/config.yaml
   echo "token: $token" >> /etc/rancher/rke2/config.yaml
-  echo "server: https://$master1:9345" >> /etc/rancher/rke2/config.yaml
+  echo "server: https://$server1:9345" >> /etc/rancher/rke2/config.yaml
   echo "tls-san:" >> /etc/rancher/rke2/config.yaml
   echo "  - $vip" >> /etc/rancher/rke2/config.yaml
-  echo "  - $master1" >> /etc/rancher/rke2/config.yaml
-  echo "  - $master2" >> /etc/rancher/rke2/config.yaml
-  echo "  - $master3" >> /etc/rancher/rke2/config.yaml
+  echo "  - $server1" >> /etc/rancher/rke2/config.yaml
+  echo "  - $server2" >> /etc/rancher/rke2/config.yaml
+  echo "  - $server3" >> /etc/rancher/rke2/config.yaml
   curl -sfL https://get.rke2.io | sh -
   systemctl enable rke2-server.service
   systemctl start rke2-server.service
   exit
 EOF
-  echo -e " \033[32;5mMaster node joined successfully!\033[0m"
+  echo -e " \033[32;5mserver node joined successfully!\033[0m"
 done
 
 kubectl get nodes

@@ -19,8 +19,8 @@
 # ansible.cfg
 kubeconfig
 kubectl
-plans/k8s/.terraform.lock.hcl
-plans/k8s/.terraform.tfstate.lock.info
-plans/k8s/terraform.tfstate
-plans/k8s/terraform.tfstate.backup
-playbooks/k3s-ansible-technotim/
+terraform/plans/k8s/.terraform.lock.hcl
+terraform/plans/k8s/.terraform.tfstate.lock.info
+terraform/plans/k8s/terraform.tfstate
+terraform/plans/k8s/terraform.tfstate.backup
+ansible/playbooks/k3s-ansible-technotim/
