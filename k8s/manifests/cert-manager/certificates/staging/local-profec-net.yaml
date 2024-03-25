@@ -5,7 +5,7 @@ metadata:
   name: local-profec-net
   namespace: default
 spec:
-  secretName: local-profec-net-staging-tls
+  secretName: profec-net-staging-tls
   issuerRef:
     name: letsencrypt-staging
     kind: ClusterIssuer
