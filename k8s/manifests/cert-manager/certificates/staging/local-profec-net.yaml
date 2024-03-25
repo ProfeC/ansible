@@ -2,7 +2,7 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: local-profec-net
+  name: profec-net
   namespace: default
 spec:
   secretName: profec-net-staging-tls
