@@ -9,7 +9,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`traefik.local.profec.net`)
+    - match: Host(`traefik.profec.net`)
       kind: Rule
       middlewares:
         - name: traefik-dashboard-basicauth
@@ -18,4 +18,4 @@ spec:
         - name: api@internal
           kind: TraefikService
   tls:
-    secretName: local-profec-net-tls
+    secretName: profec-net-tls
