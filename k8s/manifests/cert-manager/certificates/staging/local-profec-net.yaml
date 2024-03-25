@@ -9,7 +9,7 @@ spec:
   issuerRef:
     name: letsencrypt-staging
     kind: ClusterIssuer
-  commonName: "*.local.profec.net"
+  commonName: "*.profec.net"
   dnsNames:
-  - "local.profec.net"
-  - "*.local.profec.net"
+  - "profec.net"
+  - "*.profec.net"
