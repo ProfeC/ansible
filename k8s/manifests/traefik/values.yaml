@@ -8,14 +8,14 @@ additionalArguments:
 
 deployment:
   enabled: true
-  replicas: 3
+  replicas: 2
   annotations: {}
   podAnnotations: {}
   additionalContainers: []
   initContainers: []
 
-#nodeSelector:
-#  worker: "true"
+nodeSelector:
+ worker: "true"
 
 ports:
   web:
