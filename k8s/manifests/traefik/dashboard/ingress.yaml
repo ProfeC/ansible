@@ -17,5 +17,5 @@ spec:
       services:
         - name: api@internal
           kind: TraefikService
- tls:
-   secretName: local-profec-net-tls
+  tls:
+    secretName: local-profec-net-tls
